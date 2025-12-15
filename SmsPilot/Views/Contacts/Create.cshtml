@@ -1,0 +1,38 @@
+﻿@model SmsPilot.Models.Contact
+@{
+    ViewData["Title"] = "Ajouter un contact";
+}
+
+<h1>Nouveau Contact</h1>
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="mb-3">
+                <label asp-for="Nom" class="form-label"></label>
+                <input asp-for="Nom" class="form-control" />
+                <span asp-validation-for="Nom" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Prenom" class="form-label"></label>
+                <input asp-for="Prenom" class="form-control" />
+                <span asp-validation-for="Prenom" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="NumeroTelephone" class="form-label">Téléphone (+225...)</label>
+                <input asp-for="NumeroTelephone" class="form-control" placeholder="+225..." />
+                <span asp-validation-for="NumeroTelephone" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Group" class="form-label">Groupe</label>
+                <input asp-for="Group" class="form-control" placeholder="Ex: Famille, Boulot" />
+                <span asp-validation-for="Group" class="text-danger"></span>
+            </div>
+            <div class="mt-3">
+                <input type="submit" value="Enregistrer" class="btn btn-success" />
+                <a asp-action="Index" class="btn btn-secondary">Annuler</a>
+            </div>
+        </form>
+    </div>
+</div>

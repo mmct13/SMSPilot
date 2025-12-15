@@ -1,0 +1,43 @@
+﻿@model SmsPilot.Models.SmsMessage
+@{
+    ViewData["Title"] = "Nouveau Message";
+}
+
+<div class="card shadow-sm" style="max-width: 600px; margin: auto;">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="bi bi-send"></i> Nouveau SMS</h5>
+    </div>
+    <div class="card-body">
+        <form asp-action="Create">
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="mb-3">
+                <label class="form-label text-muted">Choisir un contact (Optionnel)</label>
+                <select name="SelectedContactPhone" class="form-select" asp-items="ViewBag.Contacts" onchange="document.getElementById('phoneInput').value = this.value">
+                    <option value="">-- Sélectionner --</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Destinataire" class="form-label fw-bold">Numéro (+225...)</label>
+                <input asp-for="Destinataire" class="form-control" id="phoneInput" placeholder="+2250707..." required />
+                <span asp-validation-for="Destinataire" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Contenu" class="form-label fw-bold">Message</label>
+                <textarea asp-for="Contenu" class="form-control" rows="4" maxlength="160" required></textarea>
+                <span asp-validation-for="Contenu" class="text-danger"></span>
+                <div class="text-end text-muted small">Max 160 caractères</div>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="DateEnvoiPrevue" class="form-label text-muted">Planifier (Laisser vide pour envoi immédiat)</label>
+                <input asp-for="DateEnvoiPrevue" class="form-control" type="datetime-local" />
+            </div>
+
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary btn-lg">Envoyer</button>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,36 @@
+﻿@model IEnumerable<SmsPilot.Models.Contact>
+@{
+    ViewData["Title"] = "Mes Contacts";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>Mes Contacts</h1>
+    <a asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Nouveau Contact</a>
+</div>
+
+<table class="table table-hover table-bordered bg-white">
+    <thead class="table-light">
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.Nom)</th>
+            <th>@Html.DisplayNameFor(model => model.Prenom)</th>
+            <th>Téléphone</th>
+            <th>Groupe</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.Nom)</td>
+                <td>@Html.DisplayFor(modelItem => item.Prenom)</td>
+                <td>@Html.DisplayFor(modelItem => item.NumeroTelephone)</td>
+                <td><span class="badge bg-secondary">@Html.DisplayFor(modelItem => item.Group)</span></td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-warning"><i class="bi bi-pencil"></i></a>
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,44 @@
+﻿@model IEnumerable<SmsPilot.Models.SmsMessage>
+@{
+    ViewData["Title"] = "Historique";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Historique des envois</h2>
+    <a asp-action="Create" class="btn btn-success"><i class="bi bi-plus-circle"></i> Nouveau Message</a>
+</div>
+
+<table class="table table-striped table-hover bg-white shadow-sm rounded">
+    <thead class="table-dark">
+        <tr>
+            <th>Date</th>
+            <th>Destinataire</th>
+            <th>Message</th>
+            <th>Statut</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.DateCreation.ToString("dd/MM/yy HH:mm")</td>
+                <td>@item.Destinataire</td>
+                <td>@item.Contenu</td>
+                <td>
+                    @if (item.Statut == SmsPilot.Models.SmsStatus.Envoye)
+                    {
+                        <span class="badge bg-success">Envoyé</span>
+                    }
+                    else if (item.Statut == SmsPilot.Models.SmsStatus.Echec)
+                    {
+                        <span class="badge bg-danger">Échec</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-warning text-dark">En attente</span>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

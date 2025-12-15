@@ -1,0 +1,51 @@
+﻿@model SmsPilot.ViewModels.LoginViewModel
+
+@{
+    ViewData["Title"] = "Connexion";
+    Layout = null; // Page autonome, pas de menu de navigation ici
+}
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SmsPilot - Connexion</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <style>
+        body { background-color: #f8f9fa; height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .login-card { width: 100%; max-width: 400px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); background: white; border-radius: 8px; }
+        .brand-color { color: #6f42c1; font-weight: bold; } /* Violet clair [cite: 11] */
+        .btn-brand { background-color: #6f42c1; color: white; }
+        .btn-brand:hover { background-color: #5a32a3; color: white; }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <div class="text-center mb-4">
+            <h2 class="brand-color">SMS Pilot</h2>
+            <p class="text-muted">Authentification</p>
+        </div>
+
+        <form asp-action="Login" method="post">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label">Adresse Email</label>
+                <input asp-for="Email" class="form-control" placeholder="nom@exemple.com" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Password" class="form-label">Mot de passe</label>
+                <input asp-for="Password" class="form-control" placeholder="••••••" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-brand btn-lg">Se connecter</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

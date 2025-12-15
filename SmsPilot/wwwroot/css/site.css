@@ -1,0 +1,132 @@
+﻿:root {
+  --brand-color: #000000;
+  --brand-color-rgb: 0, 0, 0;
+  --accent-color: #333333;
+  --text-color: #212529;
+  --bg-color: #ffffff;
+  --bs-primary: #000000;
+  --bs-primary-rgb: 0, 0, 0;
+  --bs-link-color: #000000;
+  --bs-link-hover-color: #333333;
+}
+
+html, body {
+  height: 100%;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+body {
+  margin-bottom: 60px;
+  color: var(--text-color);
+  background-color: var(--bg-color);
+}
+
+a {
+  color: var(--brand-color);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--accent-color);
+  text-decoration: underline;
+}
+
+/* Navbar */
+.navbar-custom {
+  background-color: var(--brand-color);
+  color: #fff;
+}
+
+.navbar-custom .navbar-brand,
+.navbar-custom .nav-link {
+  color: #fff;
+}
+
+.navbar-custom .nav-link:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.navbar-custom .btn-outline-light {
+    border-color: rgba(255,255,255, 0.5);
+    color: white;
+}
+.navbar-custom .btn-outline-light:hover {
+    background-color: white;
+    color: var(--brand-color);
+}
+
+
+/* Buttons */
+.btn-primary {
+  background-color: var(--brand-color);
+  border-color: var(--brand-color);
+  color: #fff;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+  background-color: var(--accent-color) !important;
+  border-color: var(--accent-color) !important;
+  color: #fff;
+}
+
+.btn-outline-primary {
+    color: var(--brand-color);
+    border-color: var(--brand-color);
+}
+.btn-outline-primary:hover {
+    background-color: var(--brand-color);
+    color: white;
+}
+
+/* Utilities */
+.text-primary {
+  color: var(--brand-color) !important;
+}
+
+.bg-primary {
+  background-color: var(--brand-color) !important;
+}
+
+/* Cards & shadows for elegance */
+.card {
+    border: 1px solid rgba(0,0,0,0.05);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+    border-radius: 8px;
+}
+
+.box-shadow {
+  box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
+}
+
+/* Footer for sticky footer */
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  white-space: nowrap;
+  line-height: 60px;
+  background-color: #f8f9fa; /* Light gray for footer separation */
+  color: #6c757d;
+}
+
+/* General Layout tweaks */
+main {
+    padding-top: 20px;
+}
+
+/* Icon box from previous theme (reconstructed generic) */
+.icon-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: rgba(0,0,0,0.05);
+    color: var(--brand-color);
+    margin-right: 15px;
+    font-size: 1.5rem;
+}
