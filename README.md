@@ -21,7 +21,6 @@ Conçue pour structurer la communication des organisations, elle intègre la ges
 
 - Envoi immédiat : expédition instantanée via l'API Orange
 - Envoi planifié : programmation d'un message pour une date future
-- Background Service : un service d'arrière-plan (Worker) gère l'envoi automatique des messages planifiés sans bloquer l'utilisateur
 
 ### Historique & Suivi
 
@@ -42,23 +41,23 @@ Conçue pour structurer la communication des organisations, elle intègre la ges
 - Langage : C#
 - Base de données : SQL Server (LocalDB) via Entity Framework Core (Code First)
 - Frontend : Razor Views, Bootstrap 5, Bootstrap Icons
-- Services Externes : Orange SMS API (OAuth v3)
-- Hébergement : Compatible IIS / Kestrel
+- Services externes : Orange SMS API
 
 ## Installation et Démarrage
 
 ### Prérequis
 
-- Visual Studio 2022 (Workload ASP.NET et Web)
+- Visual Studio 2022
 - .NET 8.0 SDK
 
 ### 1. Cloner le projet
 
 ```bash
-git clone https://github.com/TonPseudo/SmsPilot.git
+git clone https://github.com/mmct13/SmsPilot.git
 ```
 
 ### 2. Configuration (appsettings.json)
+
 Créez un fichier appsettings.json à la racine du projet SmsPilot avec ce contenu :
 
 ```json
