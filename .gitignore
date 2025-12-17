@@ -7,17 +7,13 @@
 *.sln.docstates
 *.suo
 
-# --- Fichiers de configuration & Sécurité (TRES IMPORTANT) ---
-# Contient tes clés API Orange/InfoBip ! Ne jamais commiter ces fichiers.
-appsettings.json
-appsettings.Development.json
-appsettings.Production.json
-
-# Si tu utilises les User Secrets de VS
-.microsoft/
+# --- Fichiers de configuration & Sécurité (CRITIQUE) ---
+# Le pattern **/ permet de chercher dans les sous-dossiers (SmsPilot/appsettings.json)
+**/appsettings.json
+**/appsettings.Development.json
+**/appsettings.Production.json
 
 # --- Base de données ---
-# Fichiers de BDD locale (si tu utilises LocalDB)
 *.mdf
 *.ldf
 
@@ -29,10 +25,9 @@ logs/
 .DS_Store
 Thumbs.db
 
-# --- Visual Studio Code (si tu l'utilises aussi) ---
+# --- Visual Studio Code ---
 .vscode/
 
 # --- Dossiers publiés ---
-# Si tu fais un "Publish", on ne veut pas le versionner
-/out/
-/publish/
+**/out/
+**/publish/
