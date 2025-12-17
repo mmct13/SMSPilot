@@ -84,7 +84,7 @@ Update Database
 
 La base étant vide au départ, injectez manuellement le premier administrateur via SQL Server Object Explorer :
 
--Table : Users
+- Table : Users
   - Données :
     - Nom : Admin
     - Email : admin@smspilot.ci
