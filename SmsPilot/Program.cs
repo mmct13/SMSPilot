@@ -18,6 +18,9 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     });
 // --- AUTHENTIFICATION (Fin) ---
 builder.Services.AddHttpClient<OrangeSmsService>();
+// Service d'arrière-plan (Worker)
+builder.Services.AddHostedService<SmsWorker>();
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 

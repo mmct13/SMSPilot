@@ -15,7 +15,7 @@ namespace SmsPilot.Controllers
         private readonly AppDbContext _context;
         private readonly OrangeSmsService _smsService;
 
-        // On injecte le contexte BDD et le Service Orange qu'on vient de créer
+        // On injecte le contexte BDD et le Service Infobip qu'on vient de créer
         public MessagesController(AppDbContext context, OrangeSmsService smsService)
         {
             _context = context;

@@ -16,13 +16,13 @@ namespace SmsPilot.Services
             _configuration = configuration;
         }
 
-        // 1. OBTENIR LE TOKEN (Authentification)
+        // 1. Authentification : Obtenir le Jeton d'accès (Bearer Token)
         private async Task<string> GetAccessTokenAsync()
         {
             var clientId = _configuration["OrangeApi:ClientId"];
             var clientSecret = _configuration["OrangeApi:ClientSecret"];
 
-            // Encodage des identifiants en Base64 pour l'en-tête Authorization Basic
+            // Encodage Base64 des identifiants pour l'authentification "Basic"
             var credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{clientId}:{clientSecret}"));
 
             var request = new HttpRequestMessage(HttpMethod.Post, "https://api.orange.com/oauth/v3/token");
@@ -35,11 +35,7 @@ namespace SmsPilot.Services
 
             var response = await _httpClient.SendAsync(request);
 
-            if (!response.IsSuccessStatusCode)
-            {
-                // En cas d'erreur, on retourne null ou on peut logger l'erreur
-                return null;
-            }
+            if (!response.IsSuccessStatusCode) return null;
 
             var json = await response.Content.ReadAsStringAsync();
             var tokenData = JsonSerializer.Deserialize<OrangeTokenResponse>(json);
@@ -47,32 +43,31 @@ namespace SmsPilot.Services
             return tokenData?.AccessToken ?? string.Empty;
         }
 
-        // 2. ENVOYER LE SMS
+        // 2. Envoi du SMS
         public async Task<bool> SendSmsAsync(string recipientPhone, string messageContent)
         {
             try
             {
-                // A. On récupère le jeton (Bearer Token)
+                // A. On récupère le token
                 string token = await GetAccessTokenAsync();
-
                 if (string.IsNullOrEmpty(token)) return false;
 
-                // B. On prépare l'URL d'envoi
-                // Note: En prod, l'expéditeur (+2250000...) doit souvent correspondre à celui déclaré chez Orange
-                var senderPhone = _configuration["OrangeApi:SenderPhone"] ?? "+2250700000000";
-                // L'URL attend le format tel:+225... encodé si nécessaire, mais ici on concatène simplement
-                var requestUrl = $"https://api.orange.com/smsmessaging/v1/outbound/tel:{senderPhone}/requests";
+                // B. Configuration de la requête
+                // Note : En mode Sandbox (Test), tu ne peux envoyer que vers tes numéros déclarés.
+                // L'URL peut varier selon ton pays (ex: /smsmessaging/v1/outbound/tel:+2250000/requests)
+                // Ici on utilise une URL générique souvent utilisée par Orange.
+                var requestUrl = "https://api.orange.com/smsmessaging/v1/outbound/tel:+22500000000/requests";
 
                 var request = new HttpRequestMessage(HttpMethod.Post, requestUrl);
                 request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-                // C. On construit le JSON spécifique attendu par Orange
+                // C. Corps du message (Format Orange)
                 var payload = new
                 {
                     outboundSMSMessageRequest = new
                     {
                         address = "tel:" + recipientPhone,
-                        senderAddress = "tel:" + senderPhone,
+                        senderAddress = "tel:+22500000000",
                         outboundSMSTextMessage = new
                         {
                             message = messageContent
@@ -88,23 +83,17 @@ namespace SmsPilot.Services
 
                 return response.IsSuccessStatusCode;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine($"Erreur Orange : {ex.Message}");
                 return false;
             }
         }
     }
 
-    // Classe utilitaire pour lire la réponse du Token
     public class OrangeTokenResponse
     {
         [JsonPropertyName("access_token")]
         public string AccessToken { get; set; }
-
-        [JsonPropertyName("token_type")]
-        public string TokenType { get; set; }
-
-        [JsonPropertyName("expires_in")]
-        public int ExpiresIn { get; set; }
     }
 }
