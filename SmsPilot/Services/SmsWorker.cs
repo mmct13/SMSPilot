@@ -63,8 +63,8 @@ namespace SmsPilot.Services
                         // 3. Mise à jour du statut
                         message.Statut = success ? SmsStatus.Envoye : SmsStatus.Echec;
 
-                        // Petit délai de courtoisie pour l'API
-                        await Task.Delay(200);
+                        // Petit délai de courtoisie pour l'API (Limite 5 TPS = 200ms, on met 250ms pour être large)
+                        await Task.Delay(250);
                     }
 
                     // 4. Sauvegarde en BDD

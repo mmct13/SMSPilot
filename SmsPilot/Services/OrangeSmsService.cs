@@ -9,11 +9,13 @@ namespace SmsPilot.Services
     {
         private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;
+        private readonly ILogger<OrangeSmsService> _logger;
 
-        public OrangeSmsService(HttpClient httpClient, IConfiguration configuration)
+        public OrangeSmsService(HttpClient httpClient, IConfiguration configuration, ILogger<OrangeSmsService> logger)
         {
             _httpClient = httpClient;
             _configuration = configuration;
+            _logger = logger;
         }
 
         // 1. Authentification : Obtenir le Jeton d'accès (Bearer Token)
@@ -35,7 +37,11 @@ namespace SmsPilot.Services
 
             var response = await _httpClient.SendAsync(request);
 
-            if (!response.IsSuccessStatusCode) return null;
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogError($"Erreur Token Orange: {response.StatusCode}");
+                return null;
+            }
 
             var json = await response.Content.ReadAsStringAsync();
             var tokenData = JsonSerializer.Deserialize<OrangeTokenResponse>(json);
@@ -55,8 +61,23 @@ namespace SmsPilot.Services
                 // B. Configuration de la requête
                 // Note : En mode Sandbox (Test), tu ne peux envoyer que vers tes numéros déclarés.
                 // L'URL peut varier selon ton pays (ex: /smsmessaging/v1/outbound/tel:+2250000/requests)
-                // Ici on utilise une URL générique souvent utilisée par Orange.
-                var requestUrl = "https://api.orange.com/smsmessaging/v1/outbound/tel:+22500000000/requests";
+
+                string rawSender = _configuration["OrangeApi:SenderAddress"] ?? "tel:+2250000";
+
+                // Normalisation pour être sûr du format : tel:+225...
+                string cleanNumber = rawSender.Replace("tel:", "").Replace("+", "").Trim();
+                string senderAddress = $"tel:+{cleanNumber}";
+                // L'encodage URL est important pour le '+' dans l'URL (tel:+225...) -> tel%3A%2B225...
+                // Mais souvent l'API Orange accepte tel:+... ou demande tel%3A%2B...
+                // On va utiliser System.Net.WebUtility.UrlEncode pour être sûr si l'API le demande, 
+                // mais attention, HttpClient l'encode parfois déjà.
+                // Pour l'instant on concatène simplement, si ça échoue on encodera.
+                // Orange doc: /outbound/{senderAddress}/requests
+
+                // Hack: L'API Orange attend souvent que le senderAddress dans l'URL soit encodé, 
+                // spécifiquement le ':' et '+' doivent être traités correctement. 
+                // Pour éviter des soucis on construit l'URL proprement.
+                var requestUrl = $"https://api.orange.com/smsmessaging/v1/outbound/{Uri.EscapeDataString(senderAddress)}/requests";
 
                 var request = new HttpRequestMessage(HttpMethod.Post, requestUrl);
                 request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
@@ -67,7 +88,7 @@ namespace SmsPilot.Services
                     outboundSMSMessageRequest = new
                     {
                         address = "tel:" + recipientPhone,
-                        senderAddress = "tel:+22500000000",
+                        senderAddress = senderAddress,
                         outboundSMSTextMessage = new
                         {
                             message = messageContent
@@ -81,12 +102,88 @@ namespace SmsPilot.Services
                 // D. Envoi
                 var response = await _httpClient.SendAsync(request);
 
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorReason = await response.Content.ReadAsStringAsync();
+                    _logger.LogError($"Erreur Envoi SMS Orange: {response.StatusCode} - {errorReason}");
+                }
+
                 return response.IsSuccessStatusCode;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Erreur Orange : {ex.Message}");
+                _logger.LogError($"Exception Envoi SMS: {ex.Message}");
                 return false;
+            }
+        }
+        // 3. Récupérer le solde SMS
+        public async Task<int> GetSmsBalanceAsync()
+        {
+            try
+            {
+                string token = await GetAccessTokenAsync();
+                if (string.IsNullOrEmpty(token))
+                {
+                    _logger.LogWarning("Impossible de récupérer le token pour le solde.");
+                    return 0;
+                }
+
+                var request = new HttpRequestMessage(HttpMethod.Get, "https://api.orange.com/sms/admin/v1/contracts");
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+                var response = await _httpClient.SendAsync(request);
+
+                var json = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+
+                    return 0;
+                }
+
+                using (JsonDocument doc = JsonDocument.Parse(json))
+                {
+                    var root = doc.RootElement;
+
+                    // Fonction locale pour rechercher récursivement
+                    int FindAvailableUnits(JsonElement element, int depth)
+                    {
+                        if (depth > 20) return 0; // Limite pour éviter StackOverflow
+
+                        if (element.ValueKind == JsonValueKind.Object)
+                        {
+                            // Le JSON réel montre directement "availableUnits" dans l'objet de contrat
+                            // Ex: [{"offerName":"SMS_OCB", "availableUnits":79, ...}]
+                            if (element.TryGetProperty("availableUnits", out var units))
+                            {
+                                return units.GetInt32();
+                            }
+
+                            // Sinon, on parcourt les propriétés
+                            foreach (var property in element.EnumerateObject())
+                            {
+                                var result = FindAvailableUnits(property.Value, depth + 1);
+                                if (result > 0) return result;
+                            }
+                        }
+                        else if (element.ValueKind == JsonValueKind.Array)
+                        {
+                            foreach (var item in element.EnumerateArray())
+                            {
+                                var result = FindAvailableUnits(item, depth + 1);
+                                if (result > 0) return result;
+                            }
+                        }
+                        return 0;
+                    }
+
+                    return FindAvailableUnits(root, 0);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Exception Solde Orange : {ex.Message}");
+                return 0;
             }
         }
     }

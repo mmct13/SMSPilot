@@ -8,17 +8,17 @@ namespace SmsPilot.Models
         public int Id { get; set; }
 
         [Required]
-        public string Nom { get; set; } // [cite: 61]
+        public string Nom { get; set; }
 
-        public string Prenom { get; set; } // [cite: 61]
+        public string Prenom { get; set; }
 
         [Required]
         [Phone]
-        public string NumeroTelephone { get; set; } // Doit respecter le format international (+225...) [cite: 63]
+        public string NumeroTelephone { get; set; } // Doit respecter le format international (+225...)
 
-        public string? Group { get; set; } // Étiquette (ex: VIP, Prospections) [cite: 65]
+        public string? Group { get; set; } // Étiquette (ex: VIP, Prospections)
 
-        // Clé étrangère vers l'Utilisateur (Chaque utilisateur gère ses propres contacts) [cite: 43]
+        // Clé étrangère vers l'Utilisateur (Chaque utilisateur gère ses propres contacts)
         public int UserId { get; set; }
 
         [ForeignKey("UserId")]

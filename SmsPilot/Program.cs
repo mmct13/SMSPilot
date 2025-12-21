@@ -45,4 +45,13 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Auth}/{action=Login}/{id?}"); // On change la page par défaut vers Login
-app.Run();
+try
+{
+    app.Run();
+}
+catch (Exception ex)
+{
+    var logger = app.Services.GetRequiredService<ILogger<Program>>();
+    logger.LogCritical(ex, "L'application s'est arrêtée de manière inattendue.");
+    throw;
+}

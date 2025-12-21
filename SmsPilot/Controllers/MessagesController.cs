@@ -45,8 +45,15 @@ namespace SmsPilot.Controllers
         {
             int userId = GetCurrentUserId();
             // On charge les contacts pour la liste déroulante
-            var contacts = _context.Contacts.Where(c => c.UserId == userId).ToList();
-            ViewBag.Contacts = new SelectList(contacts, "NumeroTelephone", "Nom");
+            var contacts = _context.Contacts
+                .Where(c => c.UserId == userId)
+                .Select(c => new
+                {
+                    NumeroTelephone = c.NumeroTelephone,
+                    NomComplet = c.Nom + " " + (c.Prenom ?? "")
+                })
+                .ToList();
+            ViewBag.Contacts = new SelectList(contacts, "NumeroTelephone", "NomComplet");
 
             return View();
         }
@@ -92,8 +99,15 @@ namespace SmsPilot.Controllers
             }
 
             // Si ça échoue, on recharge la liste
-            var contacts = _context.Contacts.Where(c => c.UserId == userId).ToList();
-            ViewBag.Contacts = new SelectList(contacts, "NumeroTelephone", "Nom");
+            var contacts = _context.Contacts
+                .Where(c => c.UserId == userId)
+                .Select(c => new
+                {
+                    NumeroTelephone = c.NumeroTelephone,
+                    NomComplet = c.Nom + " " + (c.Prenom ?? "")
+                })
+                .ToList();
+            ViewBag.Contacts = new SelectList(contacts, "NumeroTelephone", "NomComplet");
             return View(message);
         }
     }

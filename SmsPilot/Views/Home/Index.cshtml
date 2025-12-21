@@ -14,7 +14,7 @@
                 <i class="bi bi-credit-card-2-front"></i>
             </div>
             <h5 class="card-title">Crédit SMS</h5>
-            <h2 class="fw-bold">--</h2>
+            <h2 class="fw-bold">@ViewBag.SmsBalance</h2>
             <p class="text-muted small">Solde API Orange</p>
         </div>
     </div>
@@ -25,7 +25,7 @@
                 <i class="bi bi-people-fill"></i>
             </div>
             <h5 class="card-title">Mes Contacts</h5>
-            <h2 class="fw-bold">0</h2>
+            <h2 class="fw-bold">@ViewBag.ContactCount</h2>
             <p class="text-muted small">destinataires enregistrés</p>
             <a asp-controller="Contacts" asp-action="Index" class="btn btn-sm btn-outline-primary mt-2">Gérer</a>
         </div>
@@ -50,7 +50,52 @@
                 <i class="bi bi-clock-history"></i> Derniers envois
             </div>
             <div class="card-body">
-                <p class="text-muted text-center py-3">Aucun historique récent.</p>
+                @if (ViewBag.RecentMessages != null && ((IEnumerable<dynamic>)ViewBag.RecentMessages).Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Destinataire</th>
+                                    <th>Date</th>
+                                    <th>Statut</th>
+                                    <th>Message</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var msg in ViewBag.RecentMessages)
+                                {
+                                    <tr>
+                                        <td>@msg.Destinataire</td>
+                                        <td>@msg.DateCreation.ToString("dd/MM/yyyy HH:mm")</td>
+                                        <td>
+                                            @if (msg.Statut == SmsPilot.Models.SmsStatus.Envoye)
+                                            {
+                                                <span class="badge bg-success">Envoyé</span>
+                                            }
+                                            else if (msg.Statut == SmsPilot.Models.SmsStatus.Echec)
+                                            {
+                                                <span class="badge bg-danger">Échec</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-warning text-dark">En attente</span>
+                                            }
+                                        </td>
+                                        <td class="text-truncate" style="max-width: 200px;">@msg.Contenu</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="text-center mt-2">
+                        <a asp-controller="Messages" asp-action="Index" class="btn btn-link text-decoration-none">Voir tout l'historique</a>
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted text-center py-3">Aucun historique récent.</p>
+                }
             </div>
         </div>
     </div>

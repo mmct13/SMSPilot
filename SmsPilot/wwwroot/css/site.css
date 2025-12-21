@@ -16,10 +16,16 @@ html, body {
 }
 
 body {
-  margin-bottom: 60px;
+  /* Flexbox Layout for Sticky Footer */
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  margin-bottom: 0;
   color: var(--text-color);
   background-color: var(--bg-color);
 }
+
+/* ... (links) ... */
 
 a {
   color: var(--brand-color);
@@ -27,17 +33,19 @@ a {
   transition: color 0.2s ease;
 }
 
+/* ... (keep a:hover) ... */
 a:hover {
   color: var(--accent-color);
   text-decoration: underline;
 }
 
-/* Navbar */
+/* ... (Navbar) ... */
 .navbar-custom {
   background-color: var(--brand-color);
   color: #fff;
 }
 
+/* ... (rest of navbar items) ... */
 .navbar-custom .navbar-brand,
 .navbar-custom .nav-link {
   color: #fff;
@@ -103,13 +111,12 @@ a:hover {
 
 /* Footer for sticky footer */
 .footer {
-  position: absolute;
-  bottom: 0;
   width: 100%;
   white-space: nowrap;
   line-height: 60px;
   background-color: #f8f9fa; /* Light gray for footer separation */
   color: #6c757d;
+  margin-top: auto; /* Pushes footer to the bottom */
 }
 
 /* General Layout tweaks */
