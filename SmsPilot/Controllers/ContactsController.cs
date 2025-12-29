@@ -7,7 +7,7 @@ using SmsPilot.Models;
 
 namespace SmsPilot.Controllers
 {
-    [Authorize] // Oblige à être connecté
+    [Authorize] // Ici aussi, je vérifie que l'utilisateur est connecté avant d'accéder aux contacts
     public class ContactsController : Controller
     {
         private readonly AppDbContext _context;
@@ -17,18 +17,18 @@ namespace SmsPilot.Controllers
             _context = context;
         }
 
-        // Récupère l'ID de l'utilisateur connecté depuis le cookie
+        // Je récupère l'ID de l'utilisateur connecté depuis le cookie d'authentification
         private int GetCurrentUserId()
         {
             var userIdClaim = User.FindFirst("UserId");
             return userIdClaim != null ? int.Parse(userIdClaim.Value) : 0;
         }
 
-        // GET: Contacts (Liste uniquement les contacts de l'utilisateur connecté)
+        // Affichage de la liste des contacts (uniquement ceux de l'utilisateur connecté)
         public async Task<IActionResult> Index()
         {
             int userId = GetCurrentUserId();
-            // On filtre avec .Where(c => c.UserId == userId)
+            // Je filtre pour n'afficher que les contacts de cet utilisateur
             var contacts = await _context.Contacts
                 .Where(c => c.UserId == userId)
                 .ToListAsync();
@@ -43,7 +43,7 @@ namespace SmsPilot.Controllers
 
             int userId = GetCurrentUserId();
             var contact = await _context.Contacts
-                .FirstOrDefaultAsync(m => m.Id == id && m.UserId == userId); // Sécurité
+                .FirstOrDefaultAsync(m => m.Id == id && m.UserId == userId); // Important : je vérifie que le contact appartient bien à l'utilisateur
 
             if (contact == null) return NotFound();
 
@@ -53,7 +53,7 @@ namespace SmsPilot.Controllers
         // GET: Contacts/Create
         public IActionResult Create()
         {
-            // On n'a plus besoin de charger la liste des Users (ViewData["UserId"])
+            // Plus besoin de charger la liste des utilisateurs, je gère ça automatiquement
             return View();
         }
 
@@ -62,10 +62,10 @@ namespace SmsPilot.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Nom,Prenom,NumeroTelephone,Group")] Contact contact)
         {
-            // On force l'ID de l'utilisateur connecté
+            // Je force l'ID de l'utilisateur connecté pour éviter qu'on crée un contact pour quelqu'un d'autre
             contact.UserId = GetCurrentUserId();
 
-            // On retire "User" de la validation car on le définit manuellement
+            // Je retire "User" de la validation car je le définis manuellement juste au-dessus
             ModelState.Remove("User");
 
             if (ModelState.IsValid)
@@ -97,7 +97,7 @@ namespace SmsPilot.Controllers
         {
             if (id != contact.Id) return NotFound();
 
-            // On remet le UserId qu'on avait perdu dans le formulaire
+            // Je récupère le UserId qu'on avait perdu dans le formulaire (il n'est pas dans le Bind)
             contact.UserId = GetCurrentUserId();
             ModelState.Remove("User");
 

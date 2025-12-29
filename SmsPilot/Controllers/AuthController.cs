@@ -18,11 +18,11 @@ namespace SmsPilot.Controllers
             _context = context;
         }
 
-        // GET: Affiche le formulaire de connexion
+        // J'affiche le formulaire de connexion
         [HttpGet]
         public IActionResult Login()
         {
-            // Si déjà connecté, on redirige vers l'accueil (Dashboard)
+            // Si l'utilisateur est déjà connecté, je le redirige directement vers le dashboard
             if (User.Identity!.IsAuthenticated)
             {
                 return RedirectToAction("Index", "Home");
@@ -30,47 +30,47 @@ namespace SmsPilot.Controllers
             return View();
         }
 
-        // POST: Traite la connexion
+        // Ici je traite la connexion quand l'utilisateur soumet le formulaire
         [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
             if (ModelState.IsValid)
             {
-                // 1. Chercher l'utilisateur dans la BDD
-                // Note : En production, on doit hacher le mot de passe. Ici, on compare en clair pour l'exercice.
+                // Je cherche l'utilisateur dans ma base de données
+                // NOTE : En production, je devrais hacher le mot de passe. Ici c'est en clair juste pour l'exercice
                 var user = await _context.Users
                     .FirstOrDefaultAsync(u => u.Email == model.Email && u.PasswordHash == model.Password);
 
                 if (user != null)
                 {
-                    // 2. Créer les informations de l'utilisateur (Claims)
+                    // Je crée les informations de l'utilisateur (Claims) pour la session
                     var claims = new List<Claim>
                     {
                         new Claim(ClaimTypes.Name, user.Nom),
                         new Claim(ClaimTypes.Email, user.Email),
-                        new Claim(ClaimTypes.Role, user.Role.ToString()), // Important pour les droits [cite: 33]
-                        new Claim("UserId", user.Id.ToString()) // On garde l'ID pour plus tard
+                        new Claim(ClaimTypes.Role, user.Role.ToString()), // Important pour gérer les droits d'accès
+                        new Claim("UserId", user.Id.ToString()) // Je garde l'ID pour l'utiliser plus tard
                     };
 
                     var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
-                    // 3. Connecter l'utilisateur (Créer le cookie)
+                    // Je connecte l'utilisateur en créant le cookie d'authentification
                     await HttpContext.SignInAsync(
                         CookieAuthenticationDefaults.AuthenticationScheme,
                         new ClaimsPrincipal(claimsIdentity));
 
-                    // Redirection vers l'accueil
+                    // Tout est bon, je redirige vers l'accueil
                     return RedirectToAction("Index", "Home");
                 }
 
-                // Erreur [cite: 50]
+                // Si les identifiants sont incorrects, j'affiche une erreur
                 ModelState.AddModelError("", "Email ou mot de passe incorrect.");
             }
 
             return View(model);
         }
 
-        // Déconnexion [cite: 52]
+        // Déconnexion de l'utilisateur
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);

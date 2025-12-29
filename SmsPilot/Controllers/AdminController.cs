@@ -6,7 +6,7 @@ using SmsPilot.Models;
 
 namespace SmsPilot.Controllers
 {
-    // Sécurité CRITIQUE : Seul un utilisateur avec le rôle "Admin" peut entrer ici
+    // ATTENTION : Ici c'est réservé aux admins uniquement, personne d'autre ne peut entrer
     [Authorize(Roles = "Admin")]
     public class AdminController : Controller
     {
@@ -17,29 +17,28 @@ namespace SmsPilot.Controllers
             _context = context;
         }
 
-        // 1. LISTE DES UTILISATEURS (Tableau de bord Admin)
+        // Ma page d'administration où je liste tous les utilisateurs
         public async Task<IActionResult> Index()
         {
             var users = await _context.Users.ToListAsync();
             return View(users);
         }
 
-        // 2. CRÉER UN NOUVEL UTILISATEUR (Page)
+        // Formulaire pour créer un nouvel utilisateur
         public IActionResult Create()
         {
             return View();
         }
 
-        // 3. ENREGISTRER L'UTILISATEUR (Action)
+        // Traitement de la création d'utilisateur
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(User user)
         {
-            // --- CORRECTION MAJEURE ICI ---
-            // On ignore les listes vides lors de la création
+            // IMPORTANT : J'ignore les listes vides lors de la création
+            // Sinon ModelState va se plaindre que Contacts et Messages sont null
             ModelState.Remove("Contacts");
             ModelState.Remove("Messages");
-            // -----------------------------
 
             if (ModelState.IsValid)
             {
@@ -49,14 +48,14 @@ namespace SmsPilot.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            // Astuce de debug : Si ça ne marche toujours pas, regarde pourquoi
-            // Mets un point d'arrêt ici ou inspecte les erreurs :
+            // Astuce de debug si jamais ça ne marche toujours pas :
+            // Je peux mettre un point d'arrêt ici ou inspecter les erreurs comme ça :
             // var errors = ModelState.Values.SelectMany(v => v.Errors);
 
             return View(user);
         }
 
-        // 4. SUPPRIMER UN UTILISATEUR
+        // Suppression d'un utilisateur
         public async Task<IActionResult> Delete(int id)
         {
             var user = await _context.Users.FindAsync(id);

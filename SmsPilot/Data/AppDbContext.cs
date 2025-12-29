@@ -13,12 +13,12 @@ namespace SmsPilot.Data
         public DbSet<Contact> Contacts { get; set; }
         public DbSet<SmsMessage> SmsMessages { get; set; }
 
-        // Configuration spécifique (Fluent API) si besoin
+        // Ici je peux ajouter des configurations spécifiques si besoin (Fluent API)
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // Exemple : L'email doit être unique dans la base
+            // Par exemple : je m'assure que l'email est unique dans la base
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.Email)
                 .IsUnique();

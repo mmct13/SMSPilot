@@ -5,20 +5,21 @@ using SmsPilot.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configuration de la base de données SQL Server
+// Je configure ma base de données SQL Server
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// --- AUTHENTIFICATION (Début) ---
+// --- Authentification : Début ---
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.LoginPath = "/Auth/Login"; // Redirection si non connecté
-        options.ExpireTimeSpan = TimeSpan.FromMinutes(60); // Durée de la session
+        options.LoginPath = "/Auth/Login"; // Si l'utilisateur n'est pas connecté, je le redirige ici
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(60); // La session dure 1 heure
     });
-// --- AUTHENTIFICATION (Fin) ---
+// --- Authentification : Fin ---
+// Je configure le service d'envoi SMS Orange
 builder.Services.AddHttpClient<OrangeSmsService>();
-// Service d'arrière-plan (Worker)
+// J'ajoute mon service d'arrière-plan qui gère les SMS programmés
 builder.Services.AddHostedService<SmsWorker>();
 
 // Add services to the container.
@@ -44,7 +45,7 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Auth}/{action=Login}/{id?}"); // On change la page par défaut vers Login
+    pattern: "{controller=Auth}/{action=Login}/{id?}"); // Par défaut, je redirige vers la page de connexion
 try
 {
     app.Run();

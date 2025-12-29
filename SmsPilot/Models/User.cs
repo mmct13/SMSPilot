@@ -7,23 +7,23 @@ namespace SmsPilot.Models
         public int Id { get; set; }
 
         [Required(ErrorMessage = "Le nom est requis")]
-        public string Nom { get; set; } // [cite: 55]
+        public string Nom { get; set; } // Le nom de l'utilisateur
 
         [Required(ErrorMessage = "L'email est requis")]
         [EmailAddress]
-        public string Email { get; set; } // Identifiant de connexion [cite: 49]
+        public string Email { get; set; } // L'email sert d'identifiant de connexion
 
         [Required]
-        public string PasswordHash { get; set; } // On stockera le mot de passe chiffré pour la sécurité
+        public string PasswordHash { get; set; } // Je stocke le mot de passe (en clair pour l'instant, mais il faudrait le chiffrer en production)
 
-        public UserRole Role { get; set; } = UserRole.User; // Par défaut User [cite: 56]
+        public UserRole Role { get; set; } = UserRole.User; // Par défaut, un nouvel utilisateur est un "User" simple
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
-        // Relation : Un utilisateur a plusieurs contacts [cite: 43]
+        // Un utilisateur peut avoir plusieurs contacts
         public virtual ICollection<Contact> Contacts { get; set; }
 
-        // Relation : Un utilisateur a plusieurs messages (historique personnel) [cite: 45]
+        // Un utilisateur peut avoir plusieurs messages dans son historique
         public virtual ICollection<SmsMessage> Messages { get; set; }
     }
 }

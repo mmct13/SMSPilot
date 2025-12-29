@@ -14,11 +14,11 @@ namespace SmsPilot.Models
 
         [Required]
         [Phone]
-        public string NumeroTelephone { get; set; } // Doit respecter le format international (+225...)
+        public string NumeroTelephone { get; set; } // Le numéro doit être au format international (+225...)
 
-        public string? Group { get; set; } // Étiquette (ex: VIP, Prospections)
+        public string? Group { get; set; } // Une étiquette pour organiser les contacts (ex: VIP, Prospections)
 
-        // Clé étrangère vers l'Utilisateur (Chaque utilisateur gère ses propres contacts)
+        // Clé étrangère : chaque contact appartient à un utilisateur spécifique
         public int UserId { get; set; }
 
         [ForeignKey("UserId")]

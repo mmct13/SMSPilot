@@ -4,7 +4,7 @@ using SmsPilot.Models;
 
 namespace SmsPilot.Services
 {
-    // Ce service tourne en permanence en fond (BackgroundService)
+    // Ce service tourne en permanence en arrière-plan pour envoyer les SMS programmés
     public class SmsWorker : BackgroundService
     {
         private readonly IServiceProvider _serviceProvider;
@@ -31,20 +31,20 @@ namespace SmsPilot.Services
                     _logger.LogError(ex, "Erreur dans le Worker SMS.");
                 }
 
-                // Pause de 1 minute entre chaque vérification
+                // Je fais une pause d'1 minute entre chaque vérification
                 await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
             }
         }
 
         private async Task ProcessScheduledMessages()
         {
-            // On crée un scope car le Worker est un Singleton, mais le DbContext est Scoped
+            // Je crée un scope car le Worker est un Singleton, mais le DbContext est Scoped
             using (var scope = _serviceProvider.CreateScope())
             {
                 var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
                 var smsService = scope.ServiceProvider.GetRequiredService<OrangeSmsService>();
-                // 1. Trouver les messages "En Attente" dont l'heure est passée
+                // Je cherche tous les messages "En Attente" dont l'heure d'envoi est passée
                 var messagesToSend = await context.SmsMessages
                     .Where(m => m.Statut == SmsStatus.EnAttente
                              && m.DateEnvoiPrevue != null
@@ -57,17 +57,18 @@ namespace SmsPilot.Services
 
                     foreach (var message in messagesToSend)
                     {
-                        // 2. Envoi via l'API InfoBip
-                        bool success = await smsService.SendSmsAsync(message.Destinataire, message.Contenu);
+                        // J'envoie le SMS via l'API Orange
+                        var (success, apiMsgId) = await smsService.SendSmsAsync(message.Destinataire, message.Contenu);
 
-                        // 3. Mise à jour du statut
+                        // Je mets à jour le statut du message
                         message.Statut = success ? SmsStatus.Envoye : SmsStatus.Echec;
+                        message.ApiMessageId = apiMsgId;
 
-                        // Petit délai de courtoisie pour l'API (Limite 5 TPS = 200ms, on met 250ms pour être large)
+                        // Petit délai de courtoisie pour ne pas surcharger l'API (limite 5 TPS = 200ms, je mets 250ms pour être large)
                         await Task.Delay(250);
                     }
 
-                    // 4. Sauvegarde en BDD
+                    // Je sauvegarde tout en base de données
                     await context.SaveChangesAsync();
                 }
             }

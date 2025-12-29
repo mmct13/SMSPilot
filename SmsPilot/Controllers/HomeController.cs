@@ -29,20 +29,20 @@ namespace SmsPilot.Controllers
 
         public async Task<IActionResult> Index()
         {
-            // 1. Récupérer l'ID utilisateur
+            // Je récupère l'ID de l'utilisateur connecté
             int userId = GetCurrentUserId();
 
-            // 2. Compter les contacts
+            // Je compte combien de contacts l'utilisateur a
             int contactCount = 0;
             if (userId != 0)
             {
                 contactCount = await _context.Contacts.CountAsync(c => c.UserId == userId);
             }
 
-            // 3. Récupérer le solde SMS
+            // Je récupère le solde SMS depuis l'API Orange
             int smsBalance = await _smsService.GetSmsBalanceAsync();
 
-            // 4. Récupérer les 5 derniers messages
+            // Je récupère les 5 derniers messages pour l'historique récent
             var recentMessages = new List<SmsMessage>();
             if (userId != 0)
             {
@@ -53,7 +53,7 @@ namespace SmsPilot.Controllers
                     .ToListAsync();
             }
 
-            // 5. Passer à la vue
+            // J'envoie toutes ces données à la vue pour l'affichage
             ViewBag.ContactCount = contactCount;
             ViewBag.SmsBalance = smsBalance;
             ViewBag.RecentMessages = recentMessages;
